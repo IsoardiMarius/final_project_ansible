@@ -1,52 +1,48 @@
-import { Application, Request, Response, NextFunction } from 'express';
-import * as express from 'express';
-import cookieParser = require("cookie-parser");
-import bodyParser = require("body-parser");
-import cors = require("cors");
-import db from "./config/database";
+import { Application } from 'express';
+import * as https from "https";
+import * as fs from "fs";
+import {app} from "./app";
 
-import { UserRoute } from "./modules/User";
+export class HttpsServer {
+    private app: Application;
+    private readonly port: number;
+    private server: https.Server | null;
 
-export class App {
-    public app: Application;
-
-    constructor() {
-        this.app = express();
-        this.config();
-        this.routes();
+    constructor(app: Application, port: number) {
+        this.app = app;
+        this.port = port;
+        this.server = null;
     }
 
-    private config(): void {
-        this.app.use(cors());
-        this.app.use(bodyParser.json({limit: '501mb'}));
-        this.app.use(cookieParser());
+    public start() {
+        const options = {
+            key: fs.readFileSync('./config/key.pem'),
+            cert: fs.readFileSync('./config/cert.pem')
+        };
 
-        // Ajouter les headers de sécurité
-        this.app.use((req: Request, res: Response, next: NextFunction) => {
-            // Empêche le clickjacking en utilisant le header X-Frame-Options
-            res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-
-            // Empêche le sniffing MIME en utilisant le header X-Content-Type-Options
-            res.setHeader('X-Content-Type-Options', 'nosniff');
-
-            // Active la protection XSS en utilisant le header X-XSS-Protection
-            res.setHeader('X-XSS-Protection', '1; mode=block');
-
-            // Empêche les attaques CSRF en utilisant le header CSRF-TOKEN
-            res.setHeader('CSRF-TOKEN', 'randomly_generated_token');
-
-            next();
+        this.server = https.createServer(options, this.app).listen(this.port, () => {
+            console.log('Server started on port ' + this.port);
         });
-
-         db.connect();
     }
 
-    private routes(): void {
-        this.app.use('/users', new UserRoute().router);
+    public stop(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (this.server) {
+                this.server.close((err) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        console.log('Server stopped');
+                        resolve();
+                    }
+                });
+            } else {
+                console.error('Server not running');
+                resolve();
+            }
+        });
     }
 }
-
-const app = new App().app;
-app.listen(3000, () => {
-    console.log('Server started on port 3000');
-});
+// start the server
+const server = new HttpsServer(app, 3000);

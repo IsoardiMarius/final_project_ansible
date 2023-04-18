@@ -1,5 +1,9 @@
 const mysql = require('mysql2');
-require('dotenv').config();
+
+if (process.env.NODE_ENV === 'development') require('dotenv').config({ path: process.cwd() + '/.env' });
+if (process.env.NODE_ENV === 'test') require('dotenv').config({ path: process.cwd() + '/.env.test' });
+
+
 
 // Define the database connection configuration
 export class Config {
@@ -33,7 +37,7 @@ export class DatabaseConnection implements IDatabaseConnection {
                 console.log('Error connecting to Db: ' + err);
                 return;
             }
-            else console.log('Connection established to the database ' + this.config.database + ' on ' + this.config.host + ' as ' + this.config.user + '.');
+            else console.log("Environnement : " + process.env.NODE_ENV + " -->" + ' Connection established to the database ' + this.config.database + ' on ' + this.config.host + ' as ' + this.config.user + '.');
         });
     }
 
@@ -57,11 +61,11 @@ export class DatabaseConnection implements IDatabaseConnection {
 
 // Create a new database connection
 const db = new DatabaseConnection(new Config(
+    // si NODE_ENV est à 'test', on utilise la base de données de test
     process.env.DB_HOST,
     process.env.DB_USER,
     process.env.DB_DATABASE
 ));
 
-// Connect to the database
-
+export {};
 export default db;

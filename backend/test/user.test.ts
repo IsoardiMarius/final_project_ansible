@@ -1,72 +1,41 @@
-import {UserRepository, UserService} from "../src/modules/User";
+import { app } from '../src/app';
+import { HttpsServer } from '../src/server';
+import db from "../src/config/database";
+import {User} from "../src/modules/User";
+let server: HttpsServer;
 
 
-const user_exemple = {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'test@gmail.fr',
-    password: 'password'
-}
 
-describe('UserService', () => {
+beforeAll( () => {
+    if (process.env.NODE_ENV !== 'test') {
+        throw new Error('Unauthorized environment for testing -> NODE_ENV must be "test"');
+    }
+    server = new HttpsServer(app, 3000);
+    server.start();
+});
+
+afterAll(async () => {
+    db.close();
+    await server.stop();
+});
+
+describe('GET /users/:id', () => {
+    const axios = require('axios');
+
     it('should return user', async () => {
-        const userService = new UserService(new UserRepository());
-        const user = await userService.getUserById('1');
+        const user = {
+            id: 1,
+            firstname: "marius",
+            lastname: "isoardi",
+            email: "marisu@mail.com",
+            password: "marius"
+        }
 
-        expect(user).toEqual(user_exemple);
+        const response = await axios.get('https://localhost:3000/users/1');
+
+        const newUser = new User(response.data.id, response.data.firstname, response.data.lastname, response.data.email, response.data.password);
+
+        expect(response.status).toBe(200);
+        expect(newUser).toBeInstanceOf(User);
     });
 });
-
-describe('UserRepository', () => {
-    it('should return user', async () => {
-
-        const userRepository = new UserRepository();
-        const user = await userRepository.findById('1');
-
-        expect(user).toEqual(user_exemple);
-    });
-});
-
-describe('UserController', () => {
-    it('should return user', async () => {
-        const userService = new UserService(new UserRepository());
-        const user = await userService.getUserById('1');
-
-        expect(user).toEqual(user_exemple);
-    });
-});
-
-describe('UserRoute', () => {
-    it('should return user', async () => {
-        const userService = new UserService(new UserRepository());
-        const user = await userService.getUserByEmail('test@gmail.fr');
-
-        expect(user).toEqual(user_exemple);
-    });
-});
-
-describe('UserRoute', () => {
-    it('should return null', async () => {
-        const userService = new UserService(new UserRepository());
-        const user = await userService.getUserByEmail('tet@gmail.fr');
-
-        expect(user).toEqual(null);
-    });
-});
-
-// // test route user by id with supertest
-// describe('GET /users/:id', () => {
-//     it('should return user', async () => {
-//         const response = await request(app).get('/users/1');
-//
-//         expect(response.status).toBe(200);
-//         expect(response.body).toEqual(user_exemple);
-//     });
-// });
-
-
-
-
-
-

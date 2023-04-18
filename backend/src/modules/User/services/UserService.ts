@@ -7,12 +7,8 @@ export class UserService {
         this.userRepository = userRepository;
     }
 
-
     async getUserById(id: string): Promise<User | null> {
         return await this.userRepository.findById(id);
     }
 
-    async getUserByEmail(email: string): Promise<User | null> {
-        return await this.userRepository.findByEmail(email);
-    }
 }
