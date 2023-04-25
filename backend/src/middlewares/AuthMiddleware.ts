@@ -15,7 +15,7 @@ class AuthMiddleware {
         this.tokenVerifier = new JwtTokenVerifier();
     }
 
-    async authenticate(request: IRequestWithAuth, response: Response, next: NextFunction): Promise<void> {
+    public async authenticate(request: IRequestWithAuth, response: Response, next: NextFunction): Promise<void> {
         request.auth = {
             userId: '',
             ip: request.ip,

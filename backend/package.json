@@ -8,7 +8,7 @@
   "scripts": {
     "start": "NODE_ENV=development ../backend/node_modules/.bin/nodemon src/server.ts",
     "lint": "../node_modules/.bin/eslint . --ext .ts",
-    "test": "NODE_ENV=test jest --detectOpenHandles --runInBand"
+    "test": "NODE_ENV=test jest --detectOpenHandles --runInBand --forceExit"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.1",

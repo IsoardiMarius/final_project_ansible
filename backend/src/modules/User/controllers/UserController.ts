@@ -13,13 +13,17 @@ export class UserController {
 
     async getUserById(req: Request, res: Response): Promise<void> {
         const { userId } = req.params;
-        const user = await this.userService.getUserById(userId);
-        console.log(user);
-        if (!user) {
+        const get_user = await this.userService.getUserById(userId);
+
+        console.log(get_user);
+
+        if (!get_user) {
             res.status(404).send("User " + ERROR_NOT_FOUND);
             return;
         }
-        const new_user = new User(user.id, user.firstname, user.lastname, user.email, user.password);
-        res.status(200).json(new_user);
+
+        const user = new User(get_user.id, get_user.firstname, get_user.lastname, get_user.email, get_user.password);
+        res.status(200).json(user);
     }
+
 }

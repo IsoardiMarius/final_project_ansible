@@ -11,11 +11,12 @@ function App() {
 
     const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        axios.get('https://localhost:4000/api')
+        axios.get('https://192.168.64.8:3000/users/1')
             .then(response => {
                 console.log(response);
             })
             .catch(error => {
+                console.log("errrooooor")
                 console.error(error);
             });
     };

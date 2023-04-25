@@ -46,3 +46,5 @@ export class HttpsServer {
 }
 // start the server
 const server = new HttpsServer(app, 3000);
+// comment this line to run the tests
+server.start();

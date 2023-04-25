@@ -10,11 +10,13 @@ export class Config {
     host: string;
     user: string;
     database: string;
+    password: string;
 
-    constructor(host: string, user: string, database: string) {
+    constructor(host: string, user: string, database: string, password: string) {
         this.host = host;
         this.user = user;
         this.database = database;
+        this.password = password;
     }
 }
 
@@ -64,7 +66,8 @@ const db = new DatabaseConnection(new Config(
     // si NODE_ENV est à 'test', on utilise la base de données de test
     process.env.DB_HOST,
     process.env.DB_USER,
-    process.env.DB_DATABASE
+    process.env.DB_DATABASE,
+    process.env.DB_PASSWORD
 ));
 
 export {};
